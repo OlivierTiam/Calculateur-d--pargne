@@ -1,9 +1,10 @@
-// Calculateur d'Épargne Intelligent avec thème sombre/clair
+// Calculateur d'Épargne Intelligent avec persistance des données
 class CalculateurEpargne {
     constructor() {
         this.wealthChart = null;
         this.progressChart = null;
-        this.theme = 'dark'; // Thème sombre par défaut
+        this.theme = 'dark';
+        this.utilisateurId = this.genererIdUtilisateur();
         
         this.colors = {
             primary: '#818cf8',
@@ -17,19 +18,113 @@ class CalculateurEpargne {
         this.init();
     }
 
+    genererIdUtilisateur() {
+        // Génère un ID unique basé sur le navigateur et l'appareil
+        return 'user_' + Math.random().toString(36).substr(2, 9);
+    }
+
     init() {
         this.initTheme();
+        this.chargerParametres();
         this.bindEvents();
         this.initCharts();
         this.calculerEpargne();
         
-        console.log('Calculateur d\'épargne initialisé');
+        console.log('Calculateur d\'épargne initialisé pour:', this.utilisateurId);
+    }
+
+    // Sauvegarde des paramètres dans le localStorage
+    sauvegarderParametres() {
+        const parametres = {
+            montantMensuel: document.getElementById('montantMensuel').value,
+            duree: document.getElementById('duree').value,
+            taux: document.getElementById('taux').value,
+            theme: this.theme,
+            derniereModification: new Date().toISOString()
+        };
+
+        localStorage.setItem(`epargne_params_${this.utilisateurId}`, JSON.stringify(parametres));
+    }
+
+    // Chargement des paramètres depuis le localStorage
+    chargerParametres() {
+        const saved = localStorage.getItem(`epargne_params_${this.utilisateurId}`);
+        
+        if (saved) {
+            try {
+                const parametres = JSON.parse(saved);
+                
+                // Mettre à jour les champs de formulaire
+                document.getElementById('montantMensuel').value = parametres.montantMensuel || 250;
+                document.getElementById('duree').value = parametres.duree || 20;
+                document.getElementById('taux').value = parametres.taux || 4;
+                
+                // Mettre à jour le thème si différent
+                if (parametres.theme && parametres.theme !== this.theme) {
+                    this.theme = parametres.theme;
+                    this.applyTheme();
+                }
+
+                console.log('Paramètres chargés:', parametres);
+            } catch (e) {
+                console.error('Erreur lors du chargement des paramètres:', e);
+                this.parametresParDefaut();
+            }
+        } else {
+            this.parametresParDefaut();
+        }
+    }
+
+    parametresParDefaut() {
+        document.getElementById('montantMensuel').value = 250;
+        document.getElementById('duree').value = 20;
+        document.getElementById('taux').value = 4;
+    }
+
+    // Sauvegarde des résultats pour historique
+    sauvegarderResultats(resultats) {
+        const historique = this.chargerHistorique();
+        
+        const entree = {
+            timestamp: new Date().toISOString(),
+            parametres: {
+                montantMensuel: document.getElementById('montantMensuel').value,
+                duree: document.getElementById('duree').value,
+                taux: document.getElementById('taux').value
+            },
+            resultats: resultats
+        };
+
+        // Garder seulement les 10 dernières entrées
+        historique.unshift(entree);
+        if (historique.length > 10) {
+            historique.pop();
+        }
+
+        localStorage.setItem(`epargne_historique_${this.utilisateurId}`, JSON.stringify(historique));
+    }
+
+    chargerHistorique() {
+        const saved = localStorage.getItem(`epargne_historique_${this.utilisateurId}`);
+        return saved ? JSON.parse(saved) : [];
+    }
+
+    // Affichage de l'historique (optionnel)
+    afficherDernierCalcul() {
+        const historique = this.chargerHistorique();
+        if (historique.length > 0) {
+            const dernier = historique[0];
+            const date = new Date(dernier.timestamp).toLocaleDateString('fr-FR');
+            console.log(`Dernier calcul le ${date}:`, dernier.resultats);
+        }
     }
 
     initTheme() {
-        // Vérifier la préférence système
+        // Vérifier la préférence système ou le thème sauvegardé
+        const savedTheme = localStorage.getItem(`epargne_theme_${this.utilisateurId}`);
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        this.theme = prefersDark ? 'dark' : 'light';
+        
+        this.theme = savedTheme || (prefersDark ? 'dark' : 'light');
         this.applyTheme();
     }
 
@@ -37,6 +132,9 @@ class CalculateurEpargne {
         document.documentElement.setAttribute('data-theme', this.theme);
         const themeIcon = document.querySelector('.theme-icon');
         themeIcon.textContent = this.theme === 'dark' ? '☀️' : '🌙';
+        
+        // Sauvegarder la préférence de thème
+        localStorage.setItem(`epargne_theme_${this.utilisateurId}`, this.theme);
     }
 
     toggleTheme() {
@@ -49,27 +147,42 @@ class CalculateurEpargne {
         if (this.wealthChart) {
             this.wealthChart.destroy();
             this.initWealthChart();
-            this.calculerEpargne(); // Pour mettre à jour les données
+            this.calculerEpargne();
         }
         if (this.progressChart) {
             this.progressChart.destroy();
             this.initProgressChart();
-            this.calculerEpargne(); // Pour mettre à jour les données
+            this.calculerEpargne();
         }
     }
 
     bindEvents() {
-        // Inputs
+        // Inputs avec sauvegarde automatique
         const inputs = ['montantMensuel', 'duree', 'taux'];
         inputs.forEach(id => {
-            document.getElementById(id).addEventListener('input', () => {
+            const input = document.getElementById(id);
+            input.addEventListener('input', () => {
                 this.calculerEpargne();
+                this.sauvegarderParametres();
             });
         });
 
         // Bouton thème
         document.getElementById('themeToggle').addEventListener('click', () => {
             this.toggleTheme();
+        });
+
+        // Sauvegarde lors du déchargement de la page
+        window.addEventListener('beforeunload', () => {
+            this.sauvegarderParametres();
+        });
+
+        // Synchronisation entre onglets
+        window.addEventListener('storage', (e) => {
+            if (e.key === `epargne_params_${this.utilisateurId}`) {
+                this.chargerParametres();
+                this.calculerEpargne();
+            }
         });
     }
 
@@ -90,6 +203,7 @@ class CalculateurEpargne {
         );
         
         this.mettreAJourGraphiques(resultats, data);
+        this.sauvegarderResultats(resultats);
     }
 
     getValeursInput() {
@@ -144,7 +258,7 @@ class CalculateurEpargne {
     }
 
     formaterMontant(montant) {
-        return new Intl.NumberFormat('fr-FR').format(montant) + ' FCFA';
+        return new Intl.NumberFormat('fr-FR').format(montant) + ' €';
     }
 
     afficherConseil(interets, totalInvesti, pourcentageInterets) {
