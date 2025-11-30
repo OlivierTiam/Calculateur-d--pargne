@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculateur d'Épargne | Intérêts Composés</title>
+    <title>Calculateur d'Épargne FCFA | Intérêts Composés</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -13,10 +13,10 @@
         <header class="header">
             <div class="header-content">
                 <div class="logo">
-                    <div class="logo-icon"></div>
-                    <h1>Calculateur d'Épargne Intelligent</h1>
+                    <div class="logo-icon">●</div>
+                    <h1>Calculateur d'Épargne FCFA</h1>
                 </div>
-                <p class="tagline">Découvrez la puissance des intérêts composés</p>
+                <p class="tagline">La puissance des intérêts composés en Franc CFA</p>
                 <button class="theme-toggle" id="themeToggle">
                     <span class="theme-icon">🌙</span>
                 </button>
@@ -38,9 +38,10 @@
                                 Épargne mensuelle
                             </label>
                             <div class="input-wrapper">
-                                <input type="number" id="montantMensuel" value="250" min="1" class="modern-input">
+                                <input type="number" id="montantMensuel" value="50000" min="1000" step="1000" class="modern-input">
                                 <span class="input-suffix">FCFA</span>
                             </div>
+                            <div class="input-hint">Minimum: 1 000 FCFA</div>
                         </div>
 
                         <div class="input-card">
@@ -49,9 +50,10 @@
                                 Durée d'épargne
                             </label>
                             <div class="input-wrapper">
-                                <input type="number" id="duree" value="20" min="1" class="modern-input">
+                                <input type="number" id="duree" value="15" min="1" max="50" class="modern-input">
                                 <span class="input-suffix">ans</span>
                             </div>
+                            <div class="input-hint">Max: 50 ans</div>
                         </div>
 
                         <div class="input-card">
@@ -60,9 +62,10 @@
                                 Taux d'intérêt annuel
                             </label>
                             <div class="input-wrapper">
-                                <input type="number" id="taux" value="4" min="0" step="0.1" class="modern-input">
+                                <input type="number" id="taux" value="5" min="0" max="20" step="0.1" class="modern-input">
                                 <span class="input-suffix">%</span>
                             </div>
+                            <div class="input-hint">Max: 20%</div>
                         </div>
                     </div>
                 </div>
@@ -76,7 +79,8 @@
                             <div class="result-icon">■</div>
                             <div class="result-info">
                                 <div class="result-label">Total investi</div>
-                                <div class="result-value" id="totalVerse">0 €</div>
+                                <div class="result-value" id="totalVerse">0 FCFA</div>
+                                <div class="result-detail" id="detailVerse"></div>
                             </div>
                         </div>
 
@@ -84,7 +88,8 @@
                             <div class="result-icon">■</div>
                             <div class="result-info">
                                 <div class="result-label">Intérêts gagnés</div>
-                                <div class="result-value" id="interets">0 €</div>
+                                <div class="result-value" id="interets">0 FCFA</div>
+                                <div class="result-detail" id="detailInterets"></div>
                             </div>
                         </div>
 
@@ -92,7 +97,8 @@
                             <div class="result-icon">■</div>
                             <div class="result-info">
                                 <div class="result-label">Capital final</div>
-                                <div class="result-value" id="capitalFinal">0 €</div>
+                                <div class="result-value" id="capitalFinal">0 FCFA</div>
+                                <div class="result-detail" id="detailCapital"></div>
                             </div>
                         </div>
                     </div>
@@ -117,7 +123,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Développé pour démontrer la puissance de l'épargne régulière</p>
+            <p>Développé pour la communauté francophone africaine • Données sauvegardées localement</p>
         </footer>
     </div>
 

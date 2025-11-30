@@ -7,10 +7,10 @@
 
 :root {
     /* Couleurs thème clair */
-    --primary: #6366f1;
-    --primary-dark: #4f46e5;
-    --secondary: #10b981;
-    --accent: #8b5cf6;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --secondary: #059669;
+    --accent: #7c3aed;
     --text-primary: #1f2937;
     --text-secondary: #6b7280;
     --bg-primary: #ffffff;
@@ -23,10 +23,10 @@
 
 [data-theme="dark"] {
     /* Couleurs thème sombre */
-    --primary: #818cf8;
-    --primary-dark: #6366f1;
-    --secondary: #34d399;
-    --accent: #a78bfa;
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --secondary: #10b981;
+    --accent: #8b5cf6;
     --text-primary: #f9fafb;
     --text-secondary: #d1d5db;
     --bg-primary: #111827;
@@ -156,7 +156,7 @@ body {
 
 .input-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
 }
 
@@ -193,6 +193,7 @@ body {
     position: relative;
     display: flex;
     align-items: center;
+    margin-bottom: 0.5rem;
 }
 
 .modern-input {
@@ -210,7 +211,7 @@ body {
 .modern-input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .input-suffix {
@@ -218,6 +219,12 @@ body {
     right: 1rem;
     font-weight: 600;
     color: var(--text-secondary);
+}
+
+.input-hint {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
 }
 
 /* Results Section */
@@ -235,7 +242,7 @@ body {
 
 .results-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
@@ -246,7 +253,7 @@ body {
     border-radius: 12px;
     box-shadow: var(--shadow);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 1rem;
     transition: all 0.3s ease;
     border: 1px solid var(--border-color);
@@ -267,6 +274,7 @@ body {
     font-size: 1.5rem;
     flex-shrink: 0;
     opacity: 0.8;
+    margin-top: 0.25rem;
 }
 
 .result-info {
@@ -281,9 +289,16 @@ body {
 }
 
 .result-value {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 700;
+    margin-bottom: 0.25rem;
     transition: all 0.3s ease;
+}
+
+.result-detail {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    font-style: italic;
 }
 
 .result-value.updated {
@@ -347,6 +362,7 @@ body {
     padding: 2rem 1rem;
     margin-top: auto;
     border-top: 1px solid var(--border-color);
+    font-size: 0.9rem;
 }
 
 /* Responsive */
@@ -395,6 +411,10 @@ body {
     }
     
     .logo h1 {
+        font-size: 1.3rem;
+    }
+    
+    .result-value {
         font-size: 1.3rem;
     }
 }

@@ -1,5 +1,5 @@
-// Calculateur d'Épargne Intelligent avec persistance des données
-class CalculateurEpargne {
+// Calculateur d'Épargne FCFA avec persistance des données
+class CalculateurEpargneFCFA {
     constructor() {
         this.wealthChart = null;
         this.progressChart = null;
@@ -7,9 +7,9 @@ class CalculateurEpargne {
         this.utilisateurId = this.genererIdUtilisateur();
         
         this.colors = {
-            primary: '#818cf8',
-            secondary: '#34d399',
-            accent: '#a78bfa',
+            primary: '#3b82f6',
+            secondary: '#10b981',
+            accent: '#8b5cf6',
             verse: '#3b82f6',
             interets: '#10b981',
             capital: '#8b5cf6'
@@ -19,21 +19,23 @@ class CalculateurEpargne {
     }
 
     genererIdUtilisateur() {
-        // Génère un ID unique basé sur le navigateur et l'appareil
-        return 'user_' + Math.random().toString(36).substr(2, 9);
+        let id = localStorage.getItem('epargne_user_id');
+        if (!id) {
+            id = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('epargne_user_id', id);
+        }
+        return id;
     }
 
     init() {
+        console.log('Initialisation pour:', this.utilisateurId);
         this.initTheme();
         this.chargerParametres();
         this.bindEvents();
         this.initCharts();
         this.calculerEpargne();
-        
-        console.log('Calculateur d\'épargne initialisé pour:', this.utilisateurId);
     }
 
-    // Sauvegarde des paramètres dans le localStorage
     sauvegarderParametres() {
         const parametres = {
             montantMensuel: document.getElementById('montantMensuel').value,
@@ -44,9 +46,9 @@ class CalculateurEpargne {
         };
 
         localStorage.setItem(`epargne_params_${this.utilisateurId}`, JSON.stringify(parametres));
+        console.log('Paramètres sauvegardés:', parametres);
     }
 
-    // Chargement des paramètres depuis le localStorage
     chargerParametres() {
         const saved = localStorage.getItem(`epargne_params_${this.utilisateurId}`);
         
@@ -54,12 +56,10 @@ class CalculateurEpargne {
             try {
                 const parametres = JSON.parse(saved);
                 
-                // Mettre à jour les champs de formulaire
-                document.getElementById('montantMensuel').value = parametres.montantMensuel || 250;
-                document.getElementById('duree').value = parametres.duree || 20;
-                document.getElementById('taux').value = parametres.taux || 4;
+                document.getElementById('montantMensuel').value = parametres.montantMensuel || 50000;
+                document.getElementById('duree').value = parametres.duree || 15;
+                document.getElementById('taux').value = parametres.taux || 5;
                 
-                // Mettre à jour le thème si différent
                 if (parametres.theme && parametres.theme !== this.theme) {
                     this.theme = parametres.theme;
                     this.applyTheme();
@@ -67,7 +67,7 @@ class CalculateurEpargne {
 
                 console.log('Paramètres chargés:', parametres);
             } catch (e) {
-                console.error('Erreur lors du chargement des paramètres:', e);
+                console.error('Erreur chargement paramètres:', e);
                 this.parametresParDefaut();
             }
         } else {
@@ -76,12 +76,11 @@ class CalculateurEpargne {
     }
 
     parametresParDefaut() {
-        document.getElementById('montantMensuel').value = 250;
-        document.getElementById('duree').value = 20;
-        document.getElementById('taux').value = 4;
+        document.getElementById('montantMensuel').value = 50000;
+        document.getElementById('duree').value = 15;
+        document.getElementById('taux').value = 5;
     }
 
-    // Sauvegarde des résultats pour historique
     sauvegarderResultats(resultats) {
         const historique = this.chargerHistorique();
         
@@ -95,9 +94,8 @@ class CalculateurEpargne {
             resultats: resultats
         };
 
-        // Garder seulement les 10 dernières entrées
         historique.unshift(entree);
-        if (historique.length > 10) {
+        if (historique.length > 5) {
             historique.pop();
         }
 
@@ -109,18 +107,7 @@ class CalculateurEpargne {
         return saved ? JSON.parse(saved) : [];
     }
 
-    // Affichage de l'historique (optionnel)
-    afficherDernierCalcul() {
-        const historique = this.chargerHistorique();
-        if (historique.length > 0) {
-            const dernier = historique[0];
-            const date = new Date(dernier.timestamp).toLocaleDateString('fr-FR');
-            console.log(`Dernier calcul le ${date}:`, dernier.resultats);
-        }
-    }
-
     initTheme() {
-        // Vérifier la préférence système ou le thème sauvegardé
         const savedTheme = localStorage.getItem(`epargne_theme_${this.utilisateurId}`);
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         
@@ -133,7 +120,6 @@ class CalculateurEpargne {
         const themeIcon = document.querySelector('.theme-icon');
         themeIcon.textContent = this.theme === 'dark' ? '☀️' : '🌙';
         
-        // Sauvegarder la préférence de thème
         localStorage.setItem(`epargne_theme_${this.utilisateurId}`, this.theme);
     }
 
@@ -157,7 +143,6 @@ class CalculateurEpargne {
     }
 
     bindEvents() {
-        // Inputs avec sauvegarde automatique
         const inputs = ['montantMensuel', 'duree', 'taux'];
         inputs.forEach(id => {
             const input = document.getElementById(id);
@@ -167,19 +152,16 @@ class CalculateurEpargne {
             });
         });
 
-        // Bouton thème
         document.getElementById('themeToggle').addEventListener('click', () => {
             this.toggleTheme();
         });
 
-        // Sauvegarde lors du déchargement de la page
         window.addEventListener('beforeunload', () => {
             this.sauvegarderParametres();
         });
 
-        // Synchronisation entre onglets
         window.addEventListener('storage', (e) => {
-            if (e.key === `epargne_params_${this.utilisateurId}`) {
+            if (e.key === `epargne_params_${this.utilisateurId}` && e.newValue) {
                 this.chargerParametres();
                 this.calculerEpargne();
             }
@@ -215,7 +197,13 @@ class CalculateurEpargne {
     }
 
     validerInputs(data) {
-        return data.mensuel > 0 && data.annees > 0 && data.taux >= 0;
+        const isValid = data.mensuel >= 1000 && data.annees >= 1 && data.annees <= 50 && data.taux >= 0 && data.taux <= 20;
+        
+        if (!isValid) {
+            console.warn('Validation échouée:', data);
+        }
+        
+        return isValid;
     }
 
     calculerInteretsComposes(data) {
@@ -248,6 +236,7 @@ class CalculateurEpargne {
         this.mettreAJourElement('interets', this.formaterMontant(interets));
         this.mettreAJourElement('capitalFinal', this.formaterMontant(capitalFinal));
         
+        this.mettreAJourDetails(totalInvesti, interets, capitalFinal);
         this.afficherConseil(interets, totalInvesti, pourcentageInterets);
         this.animerResultats();
     }
@@ -257,8 +246,17 @@ class CalculateurEpargne {
         element.textContent = valeur;
     }
 
+    mettreAJourDetails(totalInvesti, interets, capitalFinal) {
+        const mensuel = parseFloat(document.getElementById('montantMensuel').value) || 0;
+        const annees = parseFloat(document.getElementById('duree').value) || 0;
+        
+        document.getElementById('detailVerse').textContent = `${this.formaterMontant(mensuel)} × ${annees * 12} mois`;
+        document.getElementById('detailInterets').textContent = `${Math.round((interets / (annees * 12)))} FCFA/mois en moyenne`;
+        document.getElementById('detailCapital').textContent = `${Math.round(capitalFinal / (annees * 12))} FCFA/mois épargnés`;
+    }
+
     formaterMontant(montant) {
-        return new Intl.NumberFormat('fr-FR').format(montant) + ' €';
+        return new Intl.NumberFormat('fr-FR').format(montant) + ' FCFA';
     }
 
     afficherConseil(interets, totalInvesti, pourcentageInterets) {
@@ -266,13 +264,13 @@ class CalculateurEpargne {
         let message;
 
         if (interets === 0) {
-            message = 'Commencez votre stratégie d\'épargne pour profiter des intérêts composés';
+            message = 'Augmentez le taux ou la durée pour voir les intérêts composés en action';
         } else if (pourcentageInterets < 25) {
-            message = `Les intérêts représentent ${pourcentageInterets}% de votre capital total.`;
+            message = `Les intérêts représentent ${pourcentageInterets}% de votre capital. L'épargne régulière paie !`;
         } else if (pourcentageInterets < 50) {
-            message = `Excellent ! ${pourcentageInterets}% de votre capital provient des intérêts composés.`;
+            message = `Excellent ! ${pourcentageInterets}% de gains passifs grâce aux intérêts composés.`;
         } else {
-            message = `Remarquable ! Plus de la moitié (${pourcentageInterets}%) de votre capital est généré par les intérêts.`;
+            message = `Exceptionnel ! Plus de la moitié de votre capital (${pourcentageInterets}%) provient des intérêts.`;
         }
 
         elementConseil.innerHTML = `
@@ -299,7 +297,6 @@ class CalculateurEpargne {
         const ctx = document.getElementById('wealthChart').getContext('2d');
         const isDark = this.theme === 'dark';
         const textColor = isDark ? '#f9fafb' : '#1f2937';
-        const gridColor = isDark ? '#4b5563' : '#e5e7eb';
         
         this.wealthChart = new Chart(ctx, {
             type: 'doughnut',
@@ -458,7 +455,7 @@ class CalculateurEpargne {
     }
 }
 
-// Initialisation de l'application
+// Initialisation
 document.addEventListener('DOMContentLoaded', () => {
-    new CalculateurEpargne();
+    new CalculateurEpargneFCFA();
 });
