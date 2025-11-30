@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur d'Épargne | Intérêts Composés</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon"></div>
+                    <h1>Calculateur d'Épargne Intelligent</h1>
+                </div>
+                <p class="tagline">Découvrez la puissance des intérêts composés</p>
+                <button class="theme-toggle" id="themeToggle">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Calculator Card -->
+            <div class="calculator-card">
+                <!-- Input Section -->
+                <div class="input-section">
+                    <h2>Votre Plan d'Épargne</h2>
+                    
+                    <div class="input-grid">
+                        <div class="input-card">
+                            <label for="montantMensuel" class="input-label">
+                                <span class="icon">●</span>
+                                Épargne mensuelle
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="number" id="montantMensuel" value="250" min="1" class="modern-input">
+                                <span class="input-suffix">FCFA</span>
+                            </div>
+                        </div>
+
+                        <div class="input-card">
+                            <label for="duree" class="input-label">
+                                <span class="icon">●</span>
+                                Durée d'épargne
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="number" id="duree" value="20" min="1" class="modern-input">
+                                <span class="input-suffix">ans</span>
+                            </div>
+                        </div>
+
+                        <div class="input-card">
+                            <label for="taux" class="input-label">
+                                <span class="icon">●</span>
+                                Taux d'intérêt annuel
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="number" id="taux" value="4" min="0" step="0.1" class="modern-input">
+                                <span class="input-suffix">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-section">
+                    <h2>Résultats de Votre Épargne</h2>
+                    
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-icon">■</div>
+                            <div class="result-info">
+                                <div class="result-label">Total investi</div>
+                                <div class="result-value" id="totalVerse">0 €</div>
+                            </div>
+                        </div>
+
+                        <div class="result-card">
+                            <div class="result-icon">■</div>
+                            <div class="result-info">
+                                <div class="result-label">Intérêts gagnés</div>
+                                <div class="result-value" id="interets">0 €</div>
+                            </div>
+                        </div>
+
+                        <div class="result-card highlight">
+                            <div class="result-icon">■</div>
+                            <div class="result-info">
+                                <div class="result-label">Capital final</div>
+                                <div class="result-value" id="capitalFinal">0 €</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-card" id="insight">
+                        <div class="insight-icon">●</div>
+                        <div class="insight-text">Ajustez les valeurs pour voir la magie des intérêts composés</div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <canvas id="wealthChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Développé pour démontrer la puissance de l'épargne régulière</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
